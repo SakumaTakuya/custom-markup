@@ -1,0 +1,153 @@
+@startuml
+
+namespace UI {
+    class App {
+
+    }
+
+    class Header {
+
+    }
+
+    class RuleEditor {
+
+    }
+
+    class TextEditor {
+
+    }
+
+    class Previewer {
+
+    }
+
+
+
+    App *--> Header
+    App *--> TextEditor
+    App *--> Previewer
+    Header *--> RuleEditor
+    RuleEditor --> Application.ObservableTextConverter : set rule
+    RuleEditor *--> Domain.LinteredTextArea
+    TextEditor --> Application.ObservableTextConverter : set text
+    TextEditor *--> Application.ObservableUploadableTextEditor
+}
+
+namespace Application {
+    class ObservableTextConverter {
+        - TextConverter converter
+        + setRule(Json json)
+        + setText(string text)
+    }
+
+    class TextConverter {
+        + Context context
+        + LexicalRule[] lexicalRules
+
+        + convert() : Node
+    }
+
+    class HtmlParser {
+        + LexicalRule[] lexicalRules
+        + parse(Node node) : string
+    }
+
+    class ObservableUploadableTextEditor {
+        - LinteredTextArea
+        - ImageUploader
+        + createHtml()
+    }
+
+
+    HtmlParser ..|> Domain.Observer : T=Node
+    HtmlParser --> Domain.Parser :parse
+    ObservableTextConverter ..|> Domain.Observable : T=Node
+    ObservableTextConverter *--> TextConverter : convert
+    ObservableTextConverter --> Domain.RuleTemplate
+    TextConverter *--> Domain.Context
+    ' TextConverter *--> Domain.LexicalRule
+    TextConverter --> Domain.Node
+    ' HtmlBuilder *--> Domain.LexicalRule
+    ObservableUploadableTextEditor *--> Domain.LinteredTextArea
+    ObservableUploadableTextEditor *--> Domain.ImageUploader
+    ObservableUploadableTextEditor ..|> Domain.Observable
+}
+
+namespace Domain {
+    interface Observer<T> {
+        + update(T obj)
+    }
+
+    interface Observable<T> {
+        + Observer<T>[] observers
+        + notify(T obj)
+    }
+
+    class RuleTemplate {
+        + Dict ruleset
+        + compile() : LexicalRule[]
+    }
+
+    class Context {
+        + LexicalRule[] rules
+        + string text
+        + Context(LexicalRule[] rules, string text)
+        + nextToken()
+        + currentToken()
+        + skipToken(string token)
+    }
+
+    class Node {
+        + LexicalRule rule
+        + Node[] children
+        + lex(Context context, string skip)
+    }
+    
+    class LexicalRule {
+        + LexicalType types
+        + string expression
+        + string[] childRules
+        + string skip
+    }
+
+    class Parser {
+        + parse(Node root, LexicalRule[] rules) : string
+    }
+
+    interface ImageUploader {
+        + upload(FileList files) : Promise
+    }
+
+    interface LinteredTextArea {
+        + createHtml() : HTMLElement
+        + replaceRange(string text, Position from, Position to)
+        + setText(string text, Position position)
+        + onchange()
+        + onDrop()
+    }
+
+    class Position {
+        + int line
+        + int chennel
+    }
+
+    Context --> LexicalRule : create
+    Node *--> LexicalRule
+    Node *--> Node
+}
+
+namespace Infrastructure {
+    class ImgurUploader {
+
+    }
+
+    class CodeMirrorTextArea {
+
+    }
+
+    ImgurUploader ..|> Domain.ImageUploader
+    CodeMirrorTextArea ..|> Domain.LinteredTextArea
+
+}
+
+@enduml
