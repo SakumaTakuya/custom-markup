@@ -1,0 +1,183 @@
+{
+    "block": {
+        "expression": "([\\s\\S]+)",
+        "children": [
+            [
+                "h1",
+                "h2",
+                "h3",
+                "h5",
+                "h6",
+                "quote",
+                "table",
+                "list",
+                "fence",
+                "paragraph",
+                "inline"
+            ]
+        ]
+    },
+    "h1" : {
+        "expression": "^ {0,3}# (.+)\\n",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "h2" : {
+        "expression": "^ {0,3}## (.+)\\n",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "h3" : {
+        "expression": "^ {0,3}### (.+)\\n",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "h4" : {
+        "expression": "^ {0,3}#### (.+)\\n",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "h5" : {
+        "expression": "^ {0,3}##### (.+)\\n",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "h6" : {
+        "expression": "^ {0,3}###### (.+)\\n",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "quote": {
+        "expression": "^ {0,3}(> ) *([\\s\\S])+?(?:\\n{2}|$)",
+        "children": [
+            "skip",
+            ["block"]
+        ]
+    },
+    "table": {
+        "expression": "^ *(\\|.*)\\n([ \\|\\-\\:]+)\\n([\\s\\S]+?\\n{2})+?",
+        "children": [
+            ["table_cell"],
+            ["table_line_c", "table_line_l", "table_line_r"],
+            ["table_cell"]
+        ]
+    },
+    "table_line_c": {
+        "expression": "\\|(:?)-+\\1",
+        "children": []
+    },
+    "table_line_l": {
+        "expression": "\\|:-+",
+        "children": []
+    },
+    "table_line_r": {
+        "expression": "\\|-+:",
+        "children":[]
+    },
+    "table_cell": {
+        "expression": "\\|([^\\n\\|]*)",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "fence": {
+        "expression": "^`{3}([\\s\\S]+)`{3}\\n",
+        "children": [
+            ["text"]
+        ]
+    },
+    "list": {
+        "expression": "^ {0,3}(?:\\+|\\*) ([\\s\\S]+?)(?=\\n{2}|$)",
+        "children": [
+            ["list_child", "inner_list"]
+        ]
+    },
+    "list_child": {
+        "expression": "^ {0,3}([\\s\\S]+?)(?=(?: *(?:\\+|\\*))|\\n{2}|$)",
+        "children": [
+            ["block"]
+        ]
+    },
+    "inner_list": {
+        "expression": "^( {4,})\\+( [\\s\\S]+?)(?:\\n{2}|\\n(?!\\1)|$)",
+        "children": [
+            "skip",
+            ["list_child", "list"]
+        ]
+    },
+    "paragraph": {
+        "expression": "^\\n*([\\s\\S]*?)\\n{2,}",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "inline": {
+        "expression": "(.+)",
+        "children": [
+            ["code", "img", "link", "html", "text"]
+        ]
+    },
+    "code": {
+        "expression": "`([\\s\\S]+)`",
+        "children": [
+            ["text"]
+        ]
+    },
+    "img" : {
+        "expression": "!\\[(.*?)\\]\\((.+?)\\)",
+        "children":[
+            ["inline"],
+            ["text"]
+        ]
+    },
+    "link" : {
+        "expression": "\\[(.*?)\\]\\((.+?)\\)",
+        "children": [
+            ["inline"],
+            ["text"]
+        ]
+    },
+    "html": {
+        "expression": "<(.+)>([\\s\\S]*?)<\\\\1>",
+        "children": [
+            [],
+            ["block"]
+        ]
+    },
+    "strong": {
+        "expression": "(\\*|_){2}([\\s\\S]+?)\\1{2}",
+        "children": [
+            [],
+            ["inline"]
+        ]
+    },
+    "em": {
+        "expression": "(\\*|_)([\\s\\S]+?)\\1",
+        "children": [
+            [],
+            ["inline"]
+        ]
+    },
+    "line": {
+        "expression": "~{2}([\\s\\S]+?)~{2}",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "small": {
+        "expression": "~([\\s\\S]+?)~",
+        "children": [
+            ["inline"]
+        ]
+    },
+    "text": {
+        "expression": ".+",
+        "children": []
+    }
+}
