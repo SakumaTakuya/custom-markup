@@ -1,6 +1,6 @@
 import { assert } from "console"
 import { Context } from "./context"
-import { LexicalRule } from "./rule"
+import { AnalyticRule } from "./rule"
 
 export interface LexicalNode {
     children : LexicalNode[],
@@ -47,6 +47,21 @@ export function lex(rootContext : Context) : LexicalNode {
     return root
 }
 
-export function parse(root : Node, rules : LexicalRule[]) : string{
-    return ''
+export interface ParsingRule {
+    [type : string] : {
+        format: string,
+    }
 }
+
+function format(formatString : string, ...args : any[]) : string {
+    return formatString.replace(/\$\{(\d+)\}/g, (_, k) => {  // m="{0}", k="0"
+        return args[k];
+    });
+}
+
+export function parse(node : LexicalNode, rules : ParsingRule) : string {
+    return format(rules[node.type].format, node.children.map(child => {
+        return parse(child, rules)
+    }))
+}
+

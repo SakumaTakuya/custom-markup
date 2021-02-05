@@ -1,8 +1,8 @@
-export class LexicalRule {
+export class AnalyticRule {
     constructor(
         public type: string,
         public expression: RegExp,
-        public children: LexicalRule[][],
+        public children: AnalyticRule[][],
         public hasSkip: boolean
     ) {}
 
@@ -15,22 +15,26 @@ export class LexicalRule {
     }
 }
 
-export interface LexicalRuleTemplate {
+export interface AnalyticRuleTemplate {
     [type : string] : {
         expression: string,
         children: (string[] | 'skip')[]
     }
 }
 
-export function compileRule(template : LexicalRuleTemplate) : LexicalRule[] {
+function replace() {
+    const test = /(?:$|[^\\])\(([^\n\s]+)/
+}
+
+export function compileRule(template : AnalyticRuleTemplate) : AnalyticRule[] {
     type RuleBook = {
-        [type : string] : LexicalRule
+        [type : string] : AnalyticRule
     }
 
     const ruleBook : RuleBook = {}
     for(let [type, rule] of Object.entries(template)) {
 
-        ruleBook[type] = new LexicalRule(
+        ruleBook[type] = new AnalyticRule(
             type,
             new RegExp(rule.expression),
             [],
@@ -38,7 +42,7 @@ export function compileRule(template : LexicalRuleTemplate) : LexicalRule[] {
         )
     }
 
-    const result : LexicalRule[] = []
+    const result : AnalyticRule[] = []
     for(let [type, rule] of Object.entries(template)) {
         const target = ruleBook[type]
         for (let children of rule.children) {
@@ -47,7 +51,7 @@ export function compileRule(template : LexicalRuleTemplate) : LexicalRule[] {
                 continue
             }
 
-            const childrules : LexicalRule[] = []
+            const childrules : AnalyticRule[] = []
             for(let childtype of children) {
                 childrules.push(ruleBook[childtype])
             }
@@ -59,3 +63,4 @@ export function compileRule(template : LexicalRuleTemplate) : LexicalRule[] {
 
     return result
 }
+

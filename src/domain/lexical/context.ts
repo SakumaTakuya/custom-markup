@@ -1,9 +1,9 @@
 import { assert } from "console"
-import { LexicalRule } from "./rule"
+import { AnalyticRule } from "./rule"
 
 interface Token {
     matched: string,
-    rule : LexicalRule,
+    rule : AnalyticRule,
     captures: string[],
     skip?: string
 }
@@ -14,7 +14,7 @@ export class Context {
 
     constructor(
         public text : string,
-        private rules : LexicalRule[],
+        private rules : AnalyticRule[],
         private skipToken? : string
     ) {
         this.source = text
